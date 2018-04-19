@@ -6,6 +6,12 @@ const ensureLeadingAndTrailingSlashes = path => path.replace(/^\/?/, '/').replac
 const removeTrailingSlash = path => path.replace(/\/$/, '') || '/'
 const removeQuery = path => path.split('?')[0]
 const resolvePathnameNoTrailingSlash = (path, currentPath) => removeTrailingSlash(resolvePathname(`${path}`, currentPath))
+const resolvePathnameFromMatchPathAndParams = (match, newParams) => {
+  let combinedParams = Object.assign({}, match.params, newParams)
+  return Object.keys(combinedParams)
+                      .reduce((replacedPath, param) => replacedPath.replace(':' + param, combinedParams[param]), match.path)
+                      .replace(/\(.*\)|\?/g, '')
+}
 
 const extractCurrentPath = currentPath => (
   ensureLeadingAndTrailingSlashes(removeQuery(currentPath))
@@ -16,7 +22,9 @@ const CoreLink = ({ BaseComponent, match, to: relativeTo, staticContext, ...othe
   const to = typeof relativeTo === 'object'
     ? {
       ...relativeTo,
-      pathname: resolvePathnameNoTrailingSlash(relativeTo.pathname, currentPath)
+      pathname: relativeTo.params
+        ? substituteMatch(match, relativeTo.params)
+        : resolvePathnameNoTrailingSlash(relativeTo.pathname, currentPath)
     }
     : resolvePathnameNoTrailingSlash(relativeTo, currentPath)
 
@@ -39,4 +47,4 @@ CoreLink.propTypes = {
   ]).isRequired
 }
 
-export default CoreLink
+export {CoreLink as default, resolvePathnameFromMatchPathAndParams as substituteMatch}
