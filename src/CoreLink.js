@@ -23,7 +23,7 @@ const CoreLink = ({ BaseComponent, match, to: relativeTo, staticContext, ...othe
     ? {
       ...relativeTo,
       pathname: relativeTo.params
-        ? substituteMatch(match, relativeTo.params)
+        ? resolvePathnameFromMatchPathAndParams(match, relativeTo.params)
         : resolvePathnameNoTrailingSlash(relativeTo.pathname, currentPath)
     }
     : resolvePathnameNoTrailingSlash(relativeTo, currentPath)
