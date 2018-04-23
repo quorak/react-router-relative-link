@@ -9,8 +9,11 @@ const resolvePathnameNoTrailingSlash = (path, currentPath) => removeTrailingSlas
 const resolvePathnameFromMatchPathAndParams = (match, newParams) => {
   let combinedParams = Object.assign({}, match.params, newParams)
   return Object.keys(combinedParams)
-                      .reduce((replacedPath, param) => replacedPath.replace(':' + param, combinedParams[param]), match.path)
+                      .reduce((replacedPath, param) => replacedPath.replace(':' + param, combinedParams[param] || ''), match.path)
+                      // remove regex chars: ? (.*)
                       .replace(/\(.*\)|\?/g, '')
+                      // remove trailing slash
+                      .replace(/\/$/, '')
 }
 
 const extractCurrentPath = currentPath => (
